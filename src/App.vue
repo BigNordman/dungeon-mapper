@@ -1,22 +1,24 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" :class="{ 'collapsed': isSidebarCollapsed }">
     <!-- Сайдбар -->
     <div class="sidebar" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
-      <div class="sidebar-content">
-        <h3 v-if="!isSidebarCollapsed">Меню</h3>
-        <ul>
-          <li v-if="!isSidebarCollapsed">Элемент 1</li>
-          <li v-if="!isSidebarCollapsed">Элемент 2</li>
-          <li v-if="!isSidebarCollapsed">Элемент 3</li>
-        </ul>
-      </div>
+      <!-- Кнопка переключения теперь всегда вверху -->
       <button class="toggle-btn" @click="toggleSidebar">
         {{ isSidebarCollapsed ? '>' : '<' }}
       </button>
+      
+      <div class="sidebar-content">
+        <h3 v-if="!isSidebarCollapsed">Меню</h3>
+        <ul v-if="!isSidebarCollapsed">
+          <li>Элемент 1</li>
+          <li>Элемент 2</li>
+          <li>Элемент 3</li>
+        </ul>
+      </div>
     </div>
 
     <!-- Основное содержимое -->
-    <div class="main-content" :class="{ 'expanded': isSidebarCollapsed }">
+    <div class="main-content">
       <h1>Рабочая область</h1>
       <p>Основное содержимое вашего приложения</p>
     </div>
@@ -61,24 +63,41 @@ export default defineComponent({
 }
 
 .app-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 250px 1fr;
   height: 100vh;
   font-family: Arial, sans-serif;
+  transition: grid-template-columns 0.3s ease;
+}
+
+.app-container.collapsed {
+  grid-template-columns: 50px 1fr;
 }
 
 /* Стили сайдбара */
 .sidebar {
-  width: 250px;
   background-color: #2c3e50;
   color: white;
-  transition: width 0.3s ease;
-  position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
-.sidebar-collapsed {
-  width: 50px;
+/* Кнопка переключения теперь вверху */
+.toggle-btn {
+  background-color: #34495e;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s;
+  order: -1; /* Перемещаем кнопку в начало flex-контейнера */
+}
+
+.toggle-btn:hover {
+  background-color: #3d566e;
 }
 
 .sidebar-content {
@@ -104,44 +123,21 @@ export default defineComponent({
   background-color: #34495e;
 }
 
-/* Кнопка переключения */
-.toggle-btn {
-  background-color: #34495e;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  width: 100%;
-  text-align: center;
-  transition: background-color 0.3s;
-}
-
-.toggle-btn:hover {
-  background-color: #3d566e;
-}
-
 /* Основное содержимое */
 .main-content {
-  flex-grow: 1;
   padding: 20px;
   background-color: #ecf0f1;
-  transition: margin-left 0.3s ease;
   overflow-y: auto;
-}
-
-.main-content.expanded {
-  margin-left: -200px;
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 200px;
+  .app-container {
+    grid-template-columns: 200px 1fr;
   }
   
-  .sidebar-collapsed {
-    width: 40px;
-  overflow: hidden;
+  .app-container.collapsed {
+    grid-template-columns: 40px 1fr;
   }
 }
 </style>
