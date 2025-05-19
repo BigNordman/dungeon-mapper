@@ -1,5 +1,30 @@
-<script setup lang="ts">
-import { ref } from "vue";
+<template>
+  <div class="app-container">
+    <!-- Сайдбар -->
+    <div class="sidebar" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
+      <div class="sidebar-content">
+        <h3 v-if="!isSidebarCollapsed">Меню</h3>
+        <ul>
+          <li v-if="!isSidebarCollapsed">Элемент 1</li>
+          <li v-if="!isSidebarCollapsed">Элемент 2</li>
+          <li v-if="!isSidebarCollapsed">Элемент 3</li>
+        </ul>
+      </div>
+      <button class="toggle-btn" @click="toggleSidebar">
+        {{ isSidebarCollapsed ? '>' : '<' }}
+      </button>
+    </div>
+
+    <!-- Основное содержимое -->
+    <div class="main-content" :class="{ 'expanded': isSidebarCollapsed }">
+      <h1>Рабочая область</h1>
+      <p>Основное содержимое вашего приложения</p>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
 import { invoke } from "@tauri-apps/api/core";
 
 const greetMsg = ref("");
@@ -9,152 +34,114 @@ async function greet() {
   // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
   greetMsg.value = await invoke("greet", { name: name.value });
 }
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const isSidebarCollapsed = ref(false);
+
+    const toggleSidebar = () => {
+      isSidebarCollapsed.value = !isSidebarCollapsed.value;
+    };
+
+    return {
+      isSidebarCollapsed,
+      toggleSidebar,
+    };
+  },
+});
 </script>
 
-<template>
-  <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
-
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
-    </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
-
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
-  </main>
-</template>
-
-<style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
-}
-
-</style>
 <style>
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+/* Базовые стили */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.container {
-  margin: 0;
-  padding-top: 10vh;
+.app-container {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Стили сайдбара */
+.sidebar {
+  width: 250px;
+  background-color: #2c3e50;
+  color: white;
+  transition: width 0.3s ease;
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
+.sidebar-collapsed {
+  width: 50px;
 }
 
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
+.sidebar-content {
+  padding: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
-.row {
-  display: flex;
-  justify-content: center;
+.sidebar h3 {
+  margin-bottom: 20px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.sidebar ul {
+  list-style: none;
 }
 
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
+.sidebar li {
+  padding: 10px 0;
   cursor: pointer;
 }
 
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
+.sidebar li:hover {
+  background-color: #34495e;
 }
 
-input,
-button {
-  outline: none;
+/* Кнопка переключения */
+.toggle-btn {
+  background-color: #34495e;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s;
 }
 
-#greet-input {
-  margin-right: 5px;
+.toggle-btn:hover {
+  background-color: #3d566e;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
+/* Основное содержимое */
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #ecf0f1;
+  transition: margin-left 0.3s ease;
+  overflow-y: auto;
+}
+
+.main-content.expanded {
+  margin-left: -200px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
   }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
+  
+  .sidebar-collapsed {
+    width: 40px;
+  overflow: hidden;
   }
 }
-
 </style>
